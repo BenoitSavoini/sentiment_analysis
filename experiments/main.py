@@ -6,13 +6,11 @@ Created on Sat Feb 11 14:53:56 2023
 """
 
 import spacy
-import os
 import random
-import csv
 import pandas
 from spacy.util import minibatch, compounding
 
-#exemple from internet, transforming the data
+# exemple from internet, transforming the data
 
 text = """
 Dave watched as the forest burned up on the hill,
@@ -21,34 +19,39 @@ been hastily packed and Marta was inside trying to round
 up the last of the pets. "Where could she be?" he wondered
 as he continued to wait for Marta to appear with the pets.
 """
-path = 'C:/Users/Alkios/Downloads/sentiment_analysis/data.csv'
+path = "data/data.csv"
 
 nlp = spacy.load("en_core_web_sm")
 doc = nlp(text)
 token_list = [token for token in doc]
-token_list
 
 filtered_tokens = [token for token in doc if not token.is_stop]
-filtered_tokens
 
-lemmas = [
-    f"Token: {token}, lemma: {token.lemma_}"
-    for token in filtered_tokens
-]
-lemmas
+lemmas = [f"Token: {token}, lemma: {token.lemma_}" for token in filtered_tokens]
 
 filtered_tokens[1].vector
 
 
-#importing data
+# importing data
 
-def load_training_data(data_directory, limit = 0, split = 0.8):
+
+def load_training_data(data_directory, limit=0, split=0.8):
+    """_summary_
+
+    Args:
+        data_directory (_type_): _description_
+        limit (int, optional): _description_. Defaults to 0.
+        split (float, optional): _description_. Defaults to 0.8.
+
+    Returns:
+        _type_: _description_
+    """
     reviews = []
-    colnames = ['target', 'ids', 'date', 'flag', 'user', 'text']
-    df = pandas.read_csv(data_directory, names = colnames, encoding = 'latin-1')
+    colnames = ["target", "ids", "date", "flag", "user", "text"]
+    df = pandas.read_csv(data_directory, names=colnames, encoding="latin-1")
     for i in range(len(df)):
-        text = df['text'][i]
-        spacy_label = df['target'][i]
+        text = df["text"][i]
+        spacy_label = df["target"][i]
         reviews.append((text, spacy_label))
     random.shuffle(reviews)
     if limit:
@@ -57,21 +60,21 @@ def load_training_data(data_directory, limit = 0, split = 0.8):
     return reviews[:split], reviews[split:]
 
 
+# building the ml model
 
-#building the ml model
 
+def train_model(training_data, test_data, iterations=20):
+    """_summary_
 
-def train_model(
-    training_data,
-    test_data,
-    iterations = 20
-):
+    Args:
+        training_data (_type_): _description_
+        test_data (_type_): _description_
+        iterations (int, optional): _description_. Defaults to 20.
+    """
     # Build pipeline
     nlp = spacy.load("en_core_web_sm")
     if "textcat" not in nlp.pipe_names:
-        textcat = nlp.create_pipe(
-            "textcat", config={"architecture": "simple_cnn"}
-        )
+        textcat = nlp.create_pipe("textcat", config={"architecture": "simple_cnn"})
         nlp.add_pipe(textcat, last=True)
     else:
         textcat = nlp.get_pipe("textcat")
@@ -80,9 +83,7 @@ def train_model(
     textcat.add_label("neg")
 
     # Train only textcat
-    training_excluded_pipes = [
-        pipe for pipe in nlp.pipe_names if pipe != "textcat"
-    ]
+    training_excluded_pipes = [pipe for pipe in nlp.pipe_names if pipe != "textcat"]
     with nlp.disable_pipes(training_excluded_pipes):
         optimizer = nlp.begin_training()
         # Training loop
@@ -98,13 +99,11 @@ def train_model(
             batches = minibatch(training_data, size=batch_sizes)
             for batch in batches:
                 text, labels = zip(*batch)
-                nlp.update(text, labels, drop = 0.2, sgd = optimizer, losses = loss)
-            print('hello')
+                nlp.update(text, labels, drop=0.2, sgd=optimizer, losses=loss)
+            print("hello")
             with textcat.model.use_params(optimizer.averages):
                 evaluation_results = evaluate_model(
-                    tokenizer=nlp.tokenizer,
-                    textcat=textcat,
-                    test_data=test_data
+                    tokenizer=nlp.tokenizer, textcat=textcat, test_data=test_data
                 )
                 print(
                     f"{loss['textcat']}\t{evaluation_results['precision']}"
@@ -115,14 +114,9 @@ def train_model(
     # Save model
     with nlp.use_params(optimizer.averages):
         nlp.to_disk("model_artifacts")
-        
-        
-        
-        
-        
-def evaluate_model(
-    tokenizer, textcat, test_data
-):
+
+
+def evaluate_model(tokenizer, textcat, test_data):
     reviews, labels = zip(*test_data)
     reviews = (tokenizer(review) for review in reviews)
     true_positives = 0
@@ -134,9 +128,7 @@ def evaluate_model(
         for predicted_label, score in review.cats.items():
             # Every cats dictionary includes both labels. You can get all
             # the info you need with just the pos label.
-            if (
-                predicted_label == "neg"
-            ):
+            if predicted_label == "neg":
                 continue
             if score >= 0.5 and true_label["pos"]:
                 true_positives += 1
@@ -153,10 +145,8 @@ def evaluate_model(
         f_score = 0
     else:
         f_score = 2 * (precision * recall) / (precision + recall)
-    return {"precision": precision, "recall": recall, "f-score": f_score}        
-        
-        
-   
+    return {"precision": precision, "recall": recall, "f-score": f_score}
+
 
 TEST_REVIEW = """
 Transcendently beautiful in moments outside the office, it seems almost
@@ -166,7 +156,13 @@ whether it's slapstick, farce, magical realism, or drama, but the best of it
 doesn't matter. (The worst is sort of tedious - like Office Space with less humor.)
 """
 
+
 def test_model(input_data: str = TEST_REVIEW):
+    """_summary_
+
+    Args:
+        input_data (str, optional): _description_. Defaults to TEST_REVIEW.
+    """
     #  Load saved trained model
     loaded_model = spacy.load("model_artifacts")
     # Generate prediction
@@ -182,8 +178,8 @@ def test_model(input_data: str = TEST_REVIEW):
         f"Review text: {input_data}\nPredicted sentiment: {prediction}"
         f"\tScore: {score}"
     )
-    
-    
+
+
 if __name__ == "__main__":
     train, test = load_training_data(path)
     train_model(train, test)

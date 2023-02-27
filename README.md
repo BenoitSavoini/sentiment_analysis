@@ -6,11 +6,11 @@ The following repository is a first project on sentiment analysis problem by usi
 
 ## Requirements
 
-keras == 2.11.0
-tensorflow == 2.11.0
-numpy == 1.23.1
-spacy == 3.5.0
-scikit-learn == 1.1.2
+- keras == 2.11.0
+- tensorflow == 2.11.0
+- numpy == 1.23.1
+- spacy == 3.5.0
+- scikit-learn == 1.1.2
 
 You have to download the trained pipeline *en_core_web_sm* by writing in the terminal:
 

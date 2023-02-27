@@ -14,6 +14,8 @@ The following repository is a first project on sentiment analysis problem by usi
 
 You have to download the trained pipeline *en_core_web_sm* by writing in the terminal:
 
-python -m spacy download en_core_web_sm
-
+```sh
+  python -m spacy download en_core_web_sm
+  ```
+  
 *still in progress*

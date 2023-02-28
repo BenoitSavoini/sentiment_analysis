@@ -28,7 +28,8 @@ print("Num GPUs Available: ", len(tf.config.list_physical_devices("GPU")))
 
 data_path = "data/data.csv"
 model_path = 'model/my_h5_model_pad50.h5'
-max_words = 10000
+max_words = 10000  # Nombre maximal de mots à prendre en compte dans le tokenizer
+max_len = 50  # Longueur maximale des séquences de mots
 
 # Textes de tweets d'entraînement et labels correspondants
 def run_experiment():
@@ -46,10 +47,6 @@ def run_experiment():
 
     new_train_labels = np.where(train_labels == 0, 0, np.where(train_labels == 2, 1, 2))
     new_test_labels = np.where(test_labels == 0, 0, np.where(test_labels == 2, 1, 2))
-
-    # Paramètres du tokenizer
-    max_words = 10000  # Nombre maximal de mots à prendre en compte dans le tokenizer
-    max_len = 50  # Longueur maximale des séquences de mots
 
     # Création du tokenizer
     tokenizer = Tokenizer(num_words=max_words)

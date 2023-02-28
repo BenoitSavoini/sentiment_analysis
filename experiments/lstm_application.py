@@ -20,7 +20,7 @@ from keras.models import load_model
 import tensorflow as tf
 import sys 
 sys.path.append('..')
-from package.functions import *
+from package import *
 
 print(tf.__version__)
 tf.test.gpu_device_name()

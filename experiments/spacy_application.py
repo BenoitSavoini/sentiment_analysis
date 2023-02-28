@@ -7,7 +7,7 @@ Created on Sat Feb 11 14:53:56 2023
 import spacy
 import sys 
 sys.path.append('..')
-from package.functions import *
+from package import *
 
 
 # exemple from internet, transforming the data

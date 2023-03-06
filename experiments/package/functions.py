@@ -10,6 +10,7 @@ import random
 import pandas
 from spacy.util import minibatch, compounding
 
+
 def load_training_data(data_directory):
     """Loading of the dataset from a directory.
 
@@ -31,6 +32,7 @@ def load_training_data(data_directory):
         label.append(nltk_label)
 
     return tweets, label
+
 
 def split_data(data_directory: str, limit=0, split=0.8):
     """Train-test split of the dataset from a directory.
@@ -58,6 +60,7 @@ def split_data(data_directory: str, limit=0, split=0.8):
     train = reviews[:split]
     test = reviews[split:]
     return train, test
+
 
 def train_model(training_data, test_data, iterations=20):
     """Model training

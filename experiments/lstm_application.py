@@ -18,8 +18,9 @@ from keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 from keras.models import load_model
 import tensorflow as tf
-import sys 
-sys.path.append('..')
+import sys
+
+sys.path.append("..")
 from package import *
 
 print(tf.__version__)
@@ -27,7 +28,7 @@ tf.test.gpu_device_name()
 print("Num GPUs Available: ", len(tf.config.list_physical_devices("GPU")))
 
 data_path = "data/data.csv"
-model_path = 'model/my_h5_model_pad50.h5'
+model_path = "model/my_h5_model_pad50.h5"
 max_words = 10000  # Nombre maximal de mots à prendre en compte dans le tokenizer
 max_len = 50  # Longueur maximale des séquences de mots
 
@@ -82,7 +83,7 @@ def run_experiment():
 
     loss, acc = model.evaluate(test_sequences, new_test_labels, verbose=2)
     print("Trained model, accuracy: {:5.2f}%".format(100 * acc))
-    
+
     # Exemple d'application
     tweet = "hate it !!! you're shit !"
     # Convertion du tweet en vecteur
@@ -92,6 +93,7 @@ def run_experiment():
     # Effectuer la prédiction
     prediction = model.predict(vector)
     print(prediction)
+
 
 if __name__ == "__main__":
     run_experiment()

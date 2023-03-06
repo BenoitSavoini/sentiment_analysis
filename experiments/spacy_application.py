@@ -5,8 +5,9 @@ Created on Sat Feb 11 14:53:56 2023
 @author: Alkios
 """
 import spacy
-import sys 
-sys.path.append('..')
+import sys
+
+sys.path.append("..")
 from package import *
 
 
